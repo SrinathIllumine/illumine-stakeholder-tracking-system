@@ -1,7 +1,9 @@
-import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Download, Plus } from "lucide-react";
+import { Download, LogOut, Plus } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/hooks/useSession";
 import { Button } from "@/components/ui/button";
 import { Funnel } from "@/components/stakeholders/Funnel";
 import { AddStakeholderDialog } from "@/components/stakeholders/AddStakeholderDialog";
@@ -12,6 +14,7 @@ import { historyQuery, stakeholdersQuery } from "@/lib/stakeholders";
 import { exportWorkbook } from "@/lib/export-excel";
 
 export const Route = createFileRoute("/")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Stakeholder Documentation & Tracking System" },
@@ -34,8 +37,19 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { data: stakeholders = [], isLoading } = useQuery(stakeholdersQuery);
-  const { data: history = [] } = useQuery(historyQuery);
+  const navigate = useNavigate();
+  const { session, loading: authLoading } = useSession();
+  const authed = Boolean(session);
+
+  useEffect(() => {
+    if (!authLoading && !session) void navigate({ to: "/auth" });
+  }, [authLoading, session, navigate]);
+
+  const { data: stakeholders = [], isLoading } = useQuery({
+    ...stakeholdersQuery,
+    enabled: authed,
+  });
+  const { data: history = [] } = useQuery({ ...historyQuery, enabled: authed });
 
   const [addOpen, setAddOpen] = useState(false);
   const [stageId, setStageId] = useState<string | null>(null);
@@ -46,6 +60,14 @@ function Index() {
     () => stakeholders.find((s) => s.id === detailId) ?? null,
     [stakeholders, detailId],
   );
+
+  if (!authed) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-sm text-muted-foreground">Loading…</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background">
@@ -69,6 +91,17 @@ function Index() {
             </Button>
             <Button onClick={() => setAddOpen(true)}>
               <Plus className="mr-1.5 h-4 w-4" /> Add stakeholder
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Sign out"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                void navigate({ to: "/auth" });
+              }}
+            >
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
