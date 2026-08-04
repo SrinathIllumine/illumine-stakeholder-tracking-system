@@ -21,13 +21,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Track partner and stakeholder relationships through a shared 5-stage funnel, with notes, stage history and Excel export.",
+          "Stakeholder Flow is a shared web app for tracking partner relationships through a 5-stage funnel.",
       },
       { property: "og:title", content: "Stakeholder Documentation & Tracking System" },
       {
         property: "og:description",
         content:
-          "A shared pipeline for tracking partner relationships across five stages, from Contacted to Closure.",
+          "Stakeholder Flow is a shared web app for tracking partner relationships through a 5-stage funnel.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
