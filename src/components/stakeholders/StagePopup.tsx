@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ARCHETYPES, INDUSTRIES, stageColor, stageLabel } from "@/lib/stages";
+import { ARCHETYPES, INDUSTRIES, hasReachedStage, stageColor, stageLabel } from "@/lib/stages";
 import type { Stakeholder } from "@/lib/stakeholders";
 import { Chip } from "./Chips";
 
@@ -38,7 +38,8 @@ export function StagePopup({
   const [archetype, setArchetype] = useState(ALL);
 
   const inStage = useMemo(
-    () => stakeholders.filter((s) => s.current_stage === stageId),
+    () =>
+      stageId ? stakeholders.filter((s) => hasReachedStage(s.current_stage, stageId)) : [],
     [stakeholders, stageId],
   );
 

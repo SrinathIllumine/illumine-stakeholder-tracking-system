@@ -5,6 +5,14 @@ import { Download, LogOut, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { INDUSTRIES } from "@/lib/stages";
 import { Funnel } from "@/components/stakeholders/Funnel";
 import { AddStakeholderDialog } from "@/components/stakeholders/AddStakeholderDialog";
 import { StagePopup } from "@/components/stakeholders/StagePopup";
@@ -55,6 +63,15 @@ function Index() {
   const [stageId, setStageId] = useState<string | null>(null);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [moveTo, setMoveTo] = useState<string | null>(null);
+  const [industry, setIndustry] = useState("__all__");
+
+  const visible = useMemo(
+    () =>
+      industry === "__all__"
+        ? stakeholders
+        : stakeholders.filter((s) => s.industries.includes(industry)),
+    [stakeholders, industry],
+  );
 
   const detail = useMemo(
     () => stakeholders.find((s) => s.id === detailId) ?? null,
@@ -112,12 +129,27 @@ function Index() {
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Pipeline
           </h2>
-          <span className="text-sm text-muted-foreground">
-            {isLoading ? "Loading…" : `${stakeholders.length} total`}
-          </span>
+          <div className="flex flex-wrap items-center gap-3">
+            <Select value={industry} onValueChange={setIndustry}>
+              <SelectTrigger className="w-[240px] bg-card" aria-label="Industry">
+                <SelectValue placeholder="Industry" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__all__">All industries</SelectItem>
+                {INDUSTRIES.map((i) => (
+                  <SelectItem key={i} value={i}>
+                    {i}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <span className="text-sm text-muted-foreground">
+              {isLoading ? "Loading…" : `${visible.length} total`}
+            </span>
+          </div>
         </div>
 
-        <Funnel stakeholders={stakeholders} onSelectStage={setStageId} />
+        <Funnel stakeholders={visible} onSelectStage={setStageId} />
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           Click any stage to view, search and filter the stakeholders inside it.
@@ -129,7 +161,7 @@ function Index() {
       {stageId && !detail && (
         <StagePopup
           stageId={stageId}
-          stakeholders={stakeholders}
+          stakeholders={visible}
           onClose={() => setStageId(null)}
           onOpenStakeholder={(s) => setDetailId(s.id)}
         />
