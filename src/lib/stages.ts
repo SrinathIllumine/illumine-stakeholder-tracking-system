@@ -47,6 +47,18 @@ export function stageColor(id: string): string {
   return STAGES.find((s) => s.id === id)?.color ?? "#1c2541";
 }
 
+export function stageIndex(id: string): number {
+  return STAGES.findIndex((s) => s.id === id);
+}
+
+/** Cumulative funnel rule: a stakeholder appears in every stage up to their current one. */
+export function hasReachedStage(currentStage: string, stageId: string): boolean {
+  const current = stageIndex(currentStage);
+  const target = stageIndex(stageId);
+  if (current < 0 || target < 0) return currentStage === stageId;
+  return current >= target;
+}
+
 export const INDUSTRIES = [
   "Agriculture Inputs",
   "Automotive & Auto Ancillaries",

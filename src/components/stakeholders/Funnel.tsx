@@ -1,4 +1,4 @@
-import { STAGES } from "@/lib/stages";
+import { STAGES, hasReachedStage } from "@/lib/stages";
 import type { Stakeholder } from "@/lib/stakeholders";
 
 export function Funnel({
@@ -11,7 +11,9 @@ export function Funnel({
   return (
     <div className="flex flex-col items-center gap-1.5">
       {STAGES.map((stage, i) => {
-        const count = stakeholders.filter((s) => s.current_stage === stage.id).length;
+        const count = stakeholders.filter((s) =>
+          hasReachedStage(s.current_stage, stage.id),
+        ).length;
         const next = STAGES[i + 1];
         const topWidth = stage.width;
         const bottomWidth = next ? next.width : stage.width - 12;
