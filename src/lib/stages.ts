@@ -62,6 +62,7 @@ export function hasReachedStage(currentStage: string, stageId: string): boolean 
 export const INDUSTRIES = [
   "Agriculture Inputs",
   "Automotive & Auto Ancillaries",
+  "BFSI",
   "Building Materials (Cement & Paints)",
   "Chemicals",
   "Consumer Durables / Industrial",
