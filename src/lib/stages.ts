@@ -19,19 +19,19 @@ export const STAGES: Stage[] = [
   { id: "connected", label: "Connected", color: "#2e4374", width: 86 },
   {
     id: "initial_interaction",
-    label: "Initial Interaction Completed",
+    label: "Shows initial interest",
     color: "#1e6b6b",
     width: 72,
   },
   {
     id: "discovery_workshop",
-    label: "Discovery Workshop Conducted",
+    label: "Shows deep interest (discovery workshop)",
     color: "#c1503e",
     width: 58,
   },
   {
     id: "closure",
-    label: "Closure (Alignment & Overall Purpose)",
+    label: "Complete formalities & ready to start (contract closure)",
     color: "#2f7d4f",
     width: 44,
   },
