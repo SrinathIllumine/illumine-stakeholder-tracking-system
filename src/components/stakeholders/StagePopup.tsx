@@ -16,7 +16,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ARCHETYPES, INDUSTRIES, hasReachedStage, stageColor, stageLabel } from "@/lib/stages";
+import {
+  ARCHETYPES,
+  COMMENT_TAGS,
+  INDUSTRIES,
+  OTHERS_COMMENT_TAG,
+  classifyComment,
+  hasReachedStage,
+  stageColor,
+  stageLabel,
+} from "@/lib/stages";
 import type { Stakeholder } from "@/lib/stakeholders";
 import { Chip } from "./Chips";
 
@@ -36,6 +45,7 @@ export function StagePopup({
   const [search, setSearch] = useState("");
   const [industry, setIndustry] = useState(ALL);
   const [archetype, setArchetype] = useState(ALL);
+  const [commentTag, setCommentTag] = useState(ALL);
 
   const inStage = useMemo(
     () =>
@@ -48,6 +58,7 @@ export function StagePopup({
     return inStage.filter((s) => {
       if (industry !== ALL && !s.industries.includes(industry)) return false;
       if (archetype !== ALL && s.archetype !== archetype) return false;
+      if (commentTag !== ALL && classifyComment(s.comments) !== commentTag) return false;
       if (!q) return true;
       const haystack = [
         s.name,
@@ -60,7 +71,7 @@ export function StagePopup({
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [inStage, search, industry, archetype]);
+  }, [inStage, search, industry, archetype, commentTag]);
 
   if (!stageId) return null;
 
@@ -91,7 +102,7 @@ export function StagePopup({
               className="bg-card pl-9"
             />
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <Select value={industry} onValueChange={setIndustry}>
               <SelectTrigger className="bg-card sm:flex-1">
                 <SelectValue placeholder="Industry" />
@@ -118,12 +129,27 @@ export function StagePopup({
                 ))}
               </SelectContent>
             </Select>
+            <Select value={commentTag} onValueChange={setCommentTag}>
+              <SelectTrigger className="bg-card sm:flex-1">
+                <SelectValue placeholder="Comment tag" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL}>All comment tags</SelectItem>
+                {COMMENT_TAGS.map((tag) => (
+                  <SelectItem key={tag} value={tag}>
+                    {tag}
+                  </SelectItem>
+                ))}
+                <SelectItem value={OTHERS_COMMENT_TAG}>{OTHERS_COMMENT_TAG}</SelectItem>
+              </SelectContent>
+            </Select>
             <Button
               variant="outline"
               onClick={() => {
                 setSearch("");
                 setIndustry(ALL);
                 setArchetype(ALL);
+                setCommentTag(ALL);
               }}
             >
               Clear filters

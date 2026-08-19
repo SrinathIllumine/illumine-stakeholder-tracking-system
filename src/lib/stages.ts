@@ -105,3 +105,17 @@ export const ARCHETYPES = [
   "Ex-Tech Software firms selling to BHs",
   "Ex-Consulting Partner",
 ] as const;
+
+/** Known labels the "Any comments" free-text field is checked against. */
+export const COMMENT_TAGS = ["Star Partner", "Networker", "Low fitment", "Consultant"] as const;
+
+export const OTHERS_COMMENT_TAG = "Others";
+
+/** Classifies a stakeholder's free-text comments into a known tag, or "Others". */
+export function classifyComment(comments: string | null | undefined): string {
+  const text = (comments ?? "").toLowerCase();
+  for (const tag of COMMENT_TAGS) {
+    if (text.includes(tag.toLowerCase())) return tag;
+  }
+  return OTHERS_COMMENT_TAG;
+}
