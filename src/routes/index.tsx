@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Download, LogOut, Plus } from "lucide-react";
+import { Camera, Download, LogOut, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import { INDUSTRIES } from "@/lib/stages";
 import { Funnel } from "@/components/stakeholders/Funnel";
 import { AddStakeholderDialog } from "@/components/stakeholders/AddStakeholderDialog";
 import { StagePopup } from "@/components/stakeholders/StagePopup";
+import { SnapshotView } from "@/components/stakeholders/SnapshotView";
 import { StakeholderDetail } from "@/components/stakeholders/StakeholderDetail";
 import { MoveStageDialog } from "@/components/stakeholders/MoveStageDialog";
 import { historyQuery, stakeholdersQuery } from "@/lib/stakeholders";
@@ -64,6 +65,7 @@ function Index() {
   const [detailId, setDetailId] = useState<string | null>(null);
   const [moveTo, setMoveTo] = useState<string | null>(null);
   const [industry, setIndustry] = useState("__all__");
+  const [snapshotOpen, setSnapshotOpen] = useState(false);
 
   const visible = useMemo(
     () =>
@@ -99,6 +101,13 @@ function Index() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setSnapshotOpen(true)}
+              disabled={stakeholders.length === 0}
+            >
+              <Camera className="mr-1.5 h-4 w-4" /> Snapshot View
+            </Button>
             <Button
               variant="outline"
               onClick={() => exportWorkbook(stakeholders, history)}
@@ -157,6 +166,12 @@ function Index() {
       </section>
 
       <AddStakeholderDialog open={addOpen} onOpenChange={setAddOpen} />
+
+      <SnapshotView
+        open={snapshotOpen}
+        onOpenChange={setSnapshotOpen}
+        stakeholders={stakeholders}
+      />
 
       {stageId && !detail && (
         <StagePopup

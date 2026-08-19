@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import { stageLabel } from "./stages";
+import { buildStageIndustryMatrix, INDUSTRIES, stageLabel } from "./stages";
 import type { Stakeholder, StageHistoryEntry } from "./stakeholders";
 
 function formatDate(iso: string) {
@@ -39,8 +39,18 @@ export function exportWorkbook(
     })),
   );
 
+  const matrix = buildStageIndustryMatrix(stakeholders);
+  const sheet3 = XLSX.utils.json_to_sheet(
+    matrix.map((row) => ({
+      Stage: row.stageLabel,
+      ...Object.fromEntries(INDUSTRIES.map((ind) => [ind, row.counts[ind]])),
+      Total: row.total,
+    })),
+  );
+
   const book = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(book, sheet1, "Stakeholders");
   XLSX.utils.book_append_sheet(book, sheet2, "Stage History");
+  XLSX.utils.book_append_sheet(book, sheet3, "Stage x Industry Snapshot");
   XLSX.writeFile(book, `stakeholders-${new Date().toISOString().slice(0, 10)}.xlsx`);
 }

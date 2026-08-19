@@ -77,6 +77,29 @@ export const INDUSTRIES = [
   "Textiles",
 ] as const;
 
+export interface StageIndustryMatrixRow {
+  stageId: StageId;
+  stageLabel: string;
+  counts: Record<string, number>;
+  total: number;
+}
+
+/** Cumulative count of stakeholders per stage, broken down by industry, plus totals. */
+export function buildStageIndustryMatrix(
+  stakeholders: { current_stage: string; industries: readonly string[] }[],
+): StageIndustryMatrixRow[] {
+  return STAGES.map((stage) => {
+    const counts: Record<string, number> = {};
+    for (const ind of INDUSTRIES) {
+      counts[ind] = stakeholders.filter(
+        (s) => s.industries.includes(ind) && hasReachedStage(s.current_stage, stage.id),
+      ).length;
+    }
+    const total = stakeholders.filter((s) => hasReachedStage(s.current_stage, stage.id)).length;
+    return { stageId: stage.id, stageLabel: stage.label, counts, total };
+  });
+}
+
 export const ARCHETYPES = [
   "Ex-BU Head / Ex-Head of Retail / M&S / Ex-GM or Ex-VP",
   "Ex-Tech Software firms selling to BHs",
