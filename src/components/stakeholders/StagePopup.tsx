@@ -16,21 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  ARCHETYPES,
-  COMMENT_TAGS,
-  INDUSTRIES,
-  OTHERS_COMMENT_TAG,
-  STAGES,
-  classifyComment,
-  hasReachedStage,
-  stageColor,
-  stageLabel,
-} from "@/lib/stages";
+import { INDUSTRIES, classifyComment, hasReachedStage, stageColor, stageLabel } from "@/lib/stages";
 import type { Stakeholder } from "@/lib/stakeholders";
 import { StakeholderCard } from "./StakeholderCard";
-
-const ALL = "__all__";
+import { FILTER_ALL as ALL, PartnerFilterSelects } from "./PartnerFilterSelects";
 
 export function StagePopup({
   stageId,
@@ -119,46 +108,14 @@ export function StagePopup({
                 ))}
               </SelectContent>
             </Select>
-            <Select value={archetype} onValueChange={setArchetype}>
-              <SelectTrigger className="bg-card sm:flex-1">
-                <SelectValue placeholder="Archetype" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL}>All archetypes</SelectItem>
-                {ARCHETYPES.map((a) => (
-                  <SelectItem key={a} value={a}>
-                    {a}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={commentTag} onValueChange={setCommentTag}>
-              <SelectTrigger className="bg-card sm:flex-1">
-                <SelectValue placeholder="Partner tag" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL}>Partner tags</SelectItem>
-                {COMMENT_TAGS.map((tag) => (
-                  <SelectItem key={tag} value={tag}>
-                    {tag}
-                  </SelectItem>
-                ))}
-                <SelectItem value={OTHERS_COMMENT_TAG}>{OTHERS_COMMENT_TAG}</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={latestStage} onValueChange={setLatestStage}>
-              <SelectTrigger className="bg-card sm:flex-1">
-                <SelectValue placeholder="Latest stage" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL}>All latest stages</SelectItem>
-                {STAGES.map((stage) => (
-                  <SelectItem key={stage.id} value={stage.id}>
-                    {stage.shortLabel}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <PartnerFilterSelects
+              archetype={archetype}
+              onArchetypeChange={setArchetype}
+              commentTag={commentTag}
+              onCommentTagChange={setCommentTag}
+              latestStage={latestStage}
+              onLatestStageChange={setLatestStage}
+            />
             <Button
               variant="outline"
               onClick={() => {

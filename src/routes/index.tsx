@@ -11,13 +11,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { INDUSTRIES } from "@/lib/stages";
+import { INDUSTRIES, classifyComment } from "@/lib/stages";
 import { Funnel } from "@/components/stakeholders/Funnel";
 import { AddStakeholderDialog } from "@/components/stakeholders/AddStakeholderDialog";
 import { StagePopup } from "@/components/stakeholders/StagePopup";
 import { SnapshotView } from "@/components/stakeholders/SnapshotView";
 import { StakeholderDetail } from "@/components/stakeholders/StakeholderDetail";
 import { StakeholderList } from "@/components/stakeholders/StakeholderList";
+import { IndustrySidebar } from "@/components/stakeholders/IndustrySidebar";
+import { FILTER_ALL, PartnerFilterSelects } from "@/components/stakeholders/PartnerFilterSelects";
 import { MoveStageDialog } from "@/components/stakeholders/MoveStageDialog";
 import { historyQuery, stakeholdersQuery } from "@/lib/stakeholders";
 import { exportWorkbook } from "@/lib/export-excel";
@@ -56,6 +58,9 @@ function Index() {
   const [industry, setIndustry] = useState("__all__");
   const [snapshotOpen, setSnapshotOpen] = useState(false);
   const [view, setView] = useState<"default" | "funnel">("default");
+  const [archetype, setArchetype] = useState(FILTER_ALL);
+  const [commentTag, setCommentTag] = useState(FILTER_ALL);
+  const [latestStage, setLatestStage] = useState(FILTER_ALL);
 
   const visible = useMemo(
     () =>
@@ -63,6 +68,17 @@ function Index() {
         ? stakeholders
         : stakeholders.filter((s) => s.industries.includes(industry)),
     [stakeholders, industry],
+  );
+
+  const defaultViewStakeholders = useMemo(
+    () =>
+      visible.filter((s) => {
+        if (archetype !== FILTER_ALL && s.archetype !== archetype) return false;
+        if (commentTag !== FILTER_ALL && classifyComment(s.comments) !== commentTag) return false;
+        if (latestStage !== FILTER_ALL && s.current_stage !== latestStage) return false;
+        return true;
+      }),
+    [visible, archetype, commentTag, latestStage],
   );
 
   const detail = useMemo(
@@ -112,21 +128,25 @@ function Index() {
             </TabsList>
           </Tabs>
           <div className="flex flex-wrap items-center gap-3">
-            <Select value={industry} onValueChange={setIndustry}>
-              <SelectTrigger className="w-[240px] bg-card" aria-label="Industry">
-                <SelectValue placeholder="Industry" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__all__">All industries</SelectItem>
-                {INDUSTRIES.map((i) => (
-                  <SelectItem key={i} value={i}>
-                    {i}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {view === "funnel" && (
+              <Select value={industry} onValueChange={setIndustry}>
+                <SelectTrigger className="w-[240px] bg-card" aria-label="Industry">
+                  <SelectValue placeholder="Industry" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">All industries</SelectItem>
+                  {INDUSTRIES.map((i) => (
+                    <SelectItem key={i} value={i}>
+                      {i}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             <span className="text-sm text-muted-foreground">
-              {isLoading ? "Loading…" : `${visible.length} total`}
+              {isLoading
+                ? "Loading…"
+                : `${view === "funnel" ? visible.length : defaultViewStakeholders.length} total`}
             </span>
           </div>
         </div>
@@ -139,7 +159,35 @@ function Index() {
             </p>
           </>
         ) : (
-          <StakeholderList stakeholders={visible} onOpenStakeholder={(s) => setDetailId(s.id)} />
+          <div className="flex flex-col gap-6 sm:flex-row">
+            <IndustrySidebar industry={industry} onChange={setIndustry} />
+            <div className="min-w-0 flex-1 space-y-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <PartnerFilterSelects
+                  archetype={archetype}
+                  onArchetypeChange={setArchetype}
+                  commentTag={commentTag}
+                  onCommentTagChange={setCommentTag}
+                  latestStage={latestStage}
+                  onLatestStageChange={setLatestStage}
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setArchetype(FILTER_ALL);
+                    setCommentTag(FILTER_ALL);
+                    setLatestStage(FILTER_ALL);
+                  }}
+                >
+                  Clear filters
+                </Button>
+              </div>
+              <StakeholderList
+                stakeholders={defaultViewStakeholders}
+                onOpenStakeholder={(s) => setDetailId(s.id)}
+              />
+            </div>
+          </div>
         )}
       </section>
 
