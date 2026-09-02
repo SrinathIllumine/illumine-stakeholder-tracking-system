@@ -74,14 +74,12 @@ function Index() {
     <main className="min-h-screen bg-background">
       <header className="border-b border-border bg-card/70">
         <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <div>
+          <div className="flex items-center gap-3">
+            <img src="/illumine-logo.svg" alt="Illumine" className="h-10 w-auto shrink-0" />
             <h1 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
               <span className="block">Partner Database &amp; Tracking System</span>
               <span className="block">For Retail Enablement System</span>
             </h1>
-            <p className="mt-0.5 text-sm text-muted-foreground">
-              A shared pipeline — everyone sees and edits the same records.
-            </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button
