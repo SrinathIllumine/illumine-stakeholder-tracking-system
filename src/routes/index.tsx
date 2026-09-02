@@ -26,13 +26,13 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Stakeholder Documentation & Tracking System" },
+      { title: "Partner Database & Tracking System" },
       {
         name: "description",
         content:
           "Stakeholder Flow is a shared web app for tracking partner relationships through a 5-stage funnel.",
       },
-      { property: "og:title", content: "Stakeholder Documentation & Tracking System" },
+      { property: "og:title", content: "Partner Database & Tracking System" },
       {
         property: "og:description",
         content:

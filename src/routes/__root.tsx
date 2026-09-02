@@ -78,13 +78,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Stakeholder Documentation & Tracking System" },
+      { title: "Partner Database & Tracking System" },
       {
         name: "description",
         content:
           "Stakeholder Flow is a shared web app for tracking partner relationships through a 5-stage funnel.",
       },
-      { property: "og:title", content: "Stakeholder Documentation & Tracking System" },
+      { property: "og:title", content: "Partner Database & Tracking System" },
       {
         property: "og:description",
         content:
@@ -92,7 +92,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Stakeholder Documentation & Tracking System" },
+      { name: "twitter:title", content: "Partner Database & Tracking System" },
       { name: "twitter:description", content: "Stakeholder Flow is a shared web app for tracking partner relationships through a 5-stage funnel." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f9322958-e2aa-478e-b7be-24944f66c516/id-preview-bf7f55ca--61f3b98f-e4d8-4c85-9232-4200f59df9b7.lovable.app-1785829816576.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f9322958-e2aa-478e-b7be-24944f66c516/id-preview-bf7f55ca--61f3b98f-e4d8-4c85-9232-4200f59df9b7.lovable.app-1785829816576.png" },
