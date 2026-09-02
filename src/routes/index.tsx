@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Camera, Download, Plus } from "lucide-react";
+import { Camera, Download, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -61,6 +62,7 @@ function Index() {
   const [archetype, setArchetype] = useState(FILTER_ALL);
   const [commentTag, setCommentTag] = useState(FILTER_ALL);
   const [latestStage, setLatestStage] = useState(FILTER_ALL);
+  const [search, setSearch] = useState("");
 
   const visible = useMemo(
     () =>
@@ -70,16 +72,19 @@ function Index() {
     [stakeholders, industry],
   );
 
-  const defaultViewStakeholders = useMemo(
-    () =>
-      visible.filter((s) => {
-        if (archetype !== FILTER_ALL && s.archetype !== archetype) return false;
-        if (commentTag !== FILTER_ALL && classifyComment(s.comments) !== commentTag) return false;
-        if (latestStage !== FILTER_ALL && s.current_stage !== latestStage) return false;
-        return true;
-      }),
-    [visible, archetype, commentTag, latestStage],
-  );
+  const defaultViewStakeholders = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return visible.filter((s) => {
+      if (archetype !== FILTER_ALL && s.archetype !== archetype) return false;
+      if (commentTag !== FILTER_ALL && classifyComment(s.comments) !== commentTag) return false;
+      if (latestStage !== FILTER_ALL && s.current_stage !== latestStage) return false;
+      if (!q) return true;
+      const haystack = [s.name, s.about, s.archetype, s.companies.join(" "), s.industries.join(" ")]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [visible, archetype, commentTag, latestStage, search]);
 
   const detail = useMemo(
     () => stakeholders.find((s) => s.id === detailId) ?? null,
@@ -177,10 +182,20 @@ function Index() {
                     setArchetype(FILTER_ALL);
                     setCommentTag(FILTER_ALL);
                     setLatestStage(FILTER_ALL);
+                    setSearch("");
                   }}
                 >
                   Clear filters
                 </Button>
+              </div>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search name, company, about, industry, archetype"
+                  className="bg-card pl-9"
+                />
               </div>
               <StakeholderList
                 stakeholders={defaultViewStakeholders}
