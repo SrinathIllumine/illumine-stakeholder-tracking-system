@@ -8,6 +8,8 @@ export type StageId =
 export interface Stage {
   id: StageId;
   label: string;
+  /** compact form for badges/tags */
+  shortLabel: string;
   color: string;
   /** relative funnel width in percent */
   width: number;
@@ -15,23 +17,26 @@ export interface Stage {
 
 /** Single source of truth for stage names, colors and order. */
 export const STAGES: Stage[] = [
-  { id: "contacted", label: "Contacted", color: "#1c2541", width: 100 },
-  { id: "connected", label: "Connected", color: "#2e4374", width: 86 },
+  { id: "contacted", label: "Contacted", shortLabel: "Contacted", color: "#1c2541", width: 100 },
+  { id: "connected", label: "Connected", shortLabel: "Connected", color: "#2e4374", width: 86 },
   {
     id: "initial_interaction",
     label: "Shows initial interest",
+    shortLabel: "Shows initial interest",
     color: "#1e6b6b",
     width: 72,
   },
   {
     id: "discovery_workshop",
     label: "Shows deep interest (discovery workshop)",
+    shortLabel: "Shows deep interest",
     color: "#c1503e",
     width: 58,
   },
   {
     id: "closure",
     label: "Complete formalities & ready to start (contract closure)",
+    shortLabel: "Contract closure",
     color: "#2f7d4f",
     width: 44,
   },
@@ -41,6 +46,10 @@ export const DEFAULT_STAGE: StageId = "contacted";
 
 export function stageLabel(id: string): string {
   return STAGES.find((s) => s.id === id)?.label ?? id;
+}
+
+export function stageShortLabel(id: string): string {
+  return STAGES.find((s) => s.id === id)?.shortLabel ?? id;
 }
 
 export function stageColor(id: string): string {

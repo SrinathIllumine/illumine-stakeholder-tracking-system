@@ -10,12 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { INDUSTRIES } from "@/lib/stages";
 import { Funnel } from "@/components/stakeholders/Funnel";
 import { AddStakeholderDialog } from "@/components/stakeholders/AddStakeholderDialog";
 import { StagePopup } from "@/components/stakeholders/StagePopup";
 import { SnapshotView } from "@/components/stakeholders/SnapshotView";
 import { StakeholderDetail } from "@/components/stakeholders/StakeholderDetail";
+import { StakeholderList } from "@/components/stakeholders/StakeholderList";
 import { MoveStageDialog } from "@/components/stakeholders/MoveStageDialog";
 import { historyQuery, stakeholdersQuery } from "@/lib/stakeholders";
 import { exportWorkbook } from "@/lib/export-excel";
@@ -53,6 +55,7 @@ function Index() {
   const [moveTo, setMoveTo] = useState<string | null>(null);
   const [industry, setIndustry] = useState("__all__");
   const [snapshotOpen, setSnapshotOpen] = useState(false);
+  const [view, setView] = useState<"default" | "funnel">("default");
 
   const visible = useMemo(
     () =>
@@ -73,7 +76,8 @@ function Index() {
         <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
             <h1 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-              Stakeholder Documentation &amp; Tracking System
+              <span className="block">Partner Database &amp; Tracking System</span>
+              <span className="block">For Retail Enablement System</span>
             </h1>
             <p className="mt-0.5 text-sm text-muted-foreground">
               A shared pipeline — everyone sees and edits the same records.
@@ -102,10 +106,13 @@ function Index() {
       </header>
 
       <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
-        <div className="mb-6 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Pipeline
-          </h2>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <Tabs value={view} onValueChange={(v) => setView(v as "default" | "funnel")}>
+            <TabsList>
+              <TabsTrigger value="default">Default view</TabsTrigger>
+              <TabsTrigger value="funnel">Funnel view</TabsTrigger>
+            </TabsList>
+          </Tabs>
           <div className="flex flex-wrap items-center gap-3">
             <Select value={industry} onValueChange={setIndustry}>
               <SelectTrigger className="w-[240px] bg-card" aria-label="Industry">
@@ -126,11 +133,16 @@ function Index() {
           </div>
         </div>
 
-        <Funnel stakeholders={visible} onSelectStage={setStageId} />
-
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          Click any stage to view, search and filter the stakeholders inside it.
-        </p>
+        {view === "funnel" ? (
+          <>
+            <Funnel stakeholders={visible} onSelectStage={setStageId} />
+            <p className="mt-6 text-center text-xs text-muted-foreground">
+              Click any stage to view, search and filter the stakeholders inside it.
+            </p>
+          </>
+        ) : (
+          <StakeholderList stakeholders={visible} onOpenStakeholder={(s) => setDetailId(s.id)} />
+        )}
       </section>
 
       <AddStakeholderDialog open={addOpen} onOpenChange={setAddOpen} />

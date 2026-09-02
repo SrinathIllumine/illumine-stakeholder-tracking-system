@@ -21,13 +21,14 @@ import {
   COMMENT_TAGS,
   INDUSTRIES,
   OTHERS_COMMENT_TAG,
+  STAGES,
   classifyComment,
   hasReachedStage,
   stageColor,
   stageLabel,
 } from "@/lib/stages";
 import type { Stakeholder } from "@/lib/stakeholders";
-import { Chip } from "./Chips";
+import { StakeholderCard } from "./StakeholderCard";
 
 const ALL = "__all__";
 
@@ -46,6 +47,7 @@ export function StagePopup({
   const [industry, setIndustry] = useState(ALL);
   const [archetype, setArchetype] = useState(ALL);
   const [commentTag, setCommentTag] = useState(ALL);
+  const [latestStage, setLatestStage] = useState(ALL);
 
   const inStage = useMemo(
     () =>
@@ -59,6 +61,7 @@ export function StagePopup({
       if (industry !== ALL && !s.industries.includes(industry)) return false;
       if (archetype !== ALL && s.archetype !== archetype) return false;
       if (commentTag !== ALL && classifyComment(s.comments) !== commentTag) return false;
+      if (latestStage !== ALL && s.current_stage !== latestStage) return false;
       if (!q) return true;
       const haystack = [
         s.name,
@@ -71,7 +74,7 @@ export function StagePopup({
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [inStage, search, industry, archetype, commentTag]);
+  }, [inStage, search, industry, archetype, commentTag, latestStage]);
 
   if (!stageId) return null;
 
@@ -131,16 +134,29 @@ export function StagePopup({
             </Select>
             <Select value={commentTag} onValueChange={setCommentTag}>
               <SelectTrigger className="bg-card sm:flex-1">
-                <SelectValue placeholder="Comment tag" />
+                <SelectValue placeholder="Partner tag" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={ALL}>All comment tags</SelectItem>
+                <SelectItem value={ALL}>Partner tags</SelectItem>
                 {COMMENT_TAGS.map((tag) => (
                   <SelectItem key={tag} value={tag}>
                     {tag}
                   </SelectItem>
                 ))}
                 <SelectItem value={OTHERS_COMMENT_TAG}>{OTHERS_COMMENT_TAG}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={latestStage} onValueChange={setLatestStage}>
+              <SelectTrigger className="bg-card sm:flex-1">
+                <SelectValue placeholder="Latest stage" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL}>All latest stages</SelectItem>
+                {STAGES.map((stage) => (
+                  <SelectItem key={stage.id} value={stage.id}>
+                    {stage.shortLabel}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Button
@@ -150,6 +166,7 @@ export function StagePopup({
                 setIndustry(ALL);
                 setArchetype(ALL);
                 setCommentTag(ALL);
+                setLatestStage(ALL);
               }}
             >
               Clear filters
@@ -164,39 +181,7 @@ export function StagePopup({
             </p>
           )}
           {results.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => onOpenStakeholder(s)}
-              className="w-full rounded-xl border border-border bg-card p-4 text-left transition-colors hover:border-input hover:bg-secondary/50"
-            >
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="font-semibold text-foreground">{s.name}</span>
-                {s.archetype && (
-                  <span className="text-xs text-muted-foreground">{s.archetype}</span>
-                )}
-              </div>
-              {s.about && (
-                <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{s.about}</p>
-              )}
-              {(s.industries.length > 0 || s.companies.length > 0) && (
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {s.industries.map((i) => (
-                    <Chip key={i}>{i}</Chip>
-                  ))}
-                  {s.companies.map((c) => (
-                    <Chip key={c} tone="outline">
-                      {c}
-                    </Chip>
-                  ))}
-                </div>
-              )}
-              {s.comments && (
-                <p className="mt-2 line-clamp-1 text-xs italic text-muted-foreground">
-                  “{s.comments}”
-                </p>
-              )}
-            </button>
+            <StakeholderCard key={s.id} stakeholder={s} onClick={() => onOpenStakeholder(s)} />
           ))}
         </div>
       </DialogContent>
